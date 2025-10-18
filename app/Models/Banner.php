@@ -32,4 +32,13 @@ class Banner extends Model
     {
         return $this->belongsTo(Hotel::class);
     }
+
+    public function getStatusAttribute()
+    {
+        $today = now()->toDateString();
+        if (!$this->active_from || !$this->active_to) return 'Scheduled';
+        if ($this->active_to < $today) return 'Expired';
+        if ($this->active_from > $today) return 'Upcoming';
+        return 'Active';
+    }
 }

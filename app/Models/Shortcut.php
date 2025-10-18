@@ -30,4 +30,9 @@ class Shortcut extends Model
     {
         return $this->belongsTo(Hotel::class);
     }
+
+    public function getTypeLabelAttribute()
+    {
+        return ucfirst($this->type);
+    }
 }

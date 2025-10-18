@@ -13,13 +13,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $hotelId = $user->hotel_id ?? null;
+        $hotelId = Auth::user()->hotel_id;
 
         $roomsCount = Room::where('hotel_id', $hotelId)->count();
-        $devicesCount = Device::where('hotel_id', $hotelId)->count();
-        $bannersCount = Banner::where('hotel_id', $hotelId)->count();
+        $occupiedRooms = Room::where('hotel_id', $hotelId)->where('status', 'occupied')->count();
+        $bannersCount = Banner::where('hotel_id', $hotelId)->where('is_active', true)->count();
+        $devicesOnline = Device::where('hotel_id', $hotelId)->where('status', 'online')->count();
 
-        return view('dashboard.index', compact('roomsCount', 'devicesCount', 'bannersCount'));
+        return view('dashboard.index', compact('roomsCount', 'occupiedRooms', 'bannersCount', 'devicesOnline'));
     }
 }
