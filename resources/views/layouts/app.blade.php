@@ -213,6 +213,9 @@
                 <a href="/dashboard/contents" class="{{ request()->is('dashboard/contents*') ? 'active' : '' }}">
                     <i class="bi bi-info-circle"></i> Contents
                 </a>
+                <a href="{{ route('dashboard.devices.index') }}" class="{{ request()->is('dashboard/devices*') ? 'active' : '' }}">
+                    <i class="bi bi-tv"></i> Devices
+                </a>
             @endif
 
             @if(auth()->check() && auth()->user()->isItAdmin())
@@ -222,6 +225,9 @@
                 </a>
                 <a href="/dashboard/hotels" class="{{ request()->is('dashboard/hotels*') ? 'active' : '' }}">
                     <i class="bi bi-gear"></i> Manage Hotels
+                </a>
+                <a href="{{ route('dashboard.admin.devices.index') }}" class="{{ request()->is('dashboard/admin/devices*') ? 'active' : '' }}">
+                    <i class="bi bi-hdd-network"></i> Manage Devices
                 </a>
             @endif
         </div>

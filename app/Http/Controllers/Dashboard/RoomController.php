@@ -4,44 +4,13 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Room;
+use App\Services\MqttService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class RoomController extends Controller
 {
-    // public function index()
-    // {
-    //     $rooms = Room::where('hotel_id', Auth::user()->hotel_id)->get();
-    //     return view('dashboard.rooms.index', compact('rooms'));
-    // }
-
-    // public function checkin(Request $request, $id)
-    // {
-    //     $request->validate(['guest_name' => 'required|string']);
-    //     $room = Room::findOrFail($id);
-    //     $room->update([
-    //         'guest_name' => $request->guest_name,
-    //         'checkin' => now(),
-    //         'status' => 'occupied',
-    //     ]);
-    //     // RoomUpdated::publish($room); // kirim MQTT event
-    //     return redirect()->back()->with('success', 'Guest checked in successfully.');
-    // }
-
-    // public function checkout($id)
-    // {
-    //     $room = Room::findOrFail($id);
-    //     $room->update([
-    //         'guest_name' => null,
-    //         'checkin' => null,
-    //         'checkout' => now(),
-    //         'status' => 'available'
-    //     ]);
-    //     // RoomUpdated::publish($room);
-    //     return redirect()->back()->with('success', 'Guest checked out successfully.');
-    // }
-
-
     public function index()
     {
         $hotelId = Auth::user()->hotel_id;
@@ -113,8 +82,20 @@ class RoomController extends Controller
             'status' => 'occupied',
         ]);
 
-        // (Nanti: publish MQTT ke STB)
-        // RoomUpdated::publish($room);
+        // Publish ke HiveMQ
+        try {
+            $mqtt = new MqttService();
+            $mqtt->publish("hotel/{$room->hotel_id}/room/{$room->id}", [
+                'event' => 'checkin',
+                'room_id' => $room->id,
+                'room_number' => $room->room_number,
+                'guest_name' => $room->guest_name,
+                'status' => $room->status,
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error("❌ MQTT checkin publish failed: " . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', "Guest '{$request->guest_name}' checked in successfully.");
     }
@@ -123,14 +104,31 @@ class RoomController extends Controller
     {
         $room = Room::where('hotel_id', Auth::user()->hotel_id)->findOrFail($id);
 
+        // Simpan data sebelum dihapus, supaya bisa dikirim ke MQTT
+        $previousGuest = $room->guest_name;
+        $roomNumber = $room->room_number;
+
+        // Update status kamar
         $room->update([
             'guest_name' => null,
             'checkout' => now(),
             'status' => 'available',
         ]);
 
-        // (Nanti: publish MQTT ke STB)
-        // RoomUpdated::publish($room);
+        // Kirim event ke HiveMQ
+        try {
+            $mqtt = new MqttService();
+            $mqtt->publish("hotel/{$room->hotel_id}/room/{$room->id}", [
+                'event' => 'checkout',
+                'room_id' => $room->id,
+                'room_number' => $roomNumber,
+                'guest_name' => $previousGuest,
+                'status' => $room->status,
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error("❌ MQTT checkout publish failed: " . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Guest checked out successfully.');
     }

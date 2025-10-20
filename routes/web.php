@@ -5,6 +5,7 @@ use App\Http\Controllers\Dashboard\AdminHotelController;
 use App\Http\Controllers\Dashboard\BannerController;
 use App\Http\Controllers\Dashboard\ContentController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Dashboard\DeviceController;
 use App\Http\Controllers\Dashboard\HotelController;
 use App\Http\Controllers\Dashboard\RoomController;
 use App\Http\Controllers\Dashboard\ShortcutController;
@@ -46,10 +47,17 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{id}', [AdminHotelController::class, 'destroy'])->name('dashboard.hotels.destroy');
         });
 
+    Route::middleware(['auth', 'role:it_admin'])
+        ->prefix('dashboard/admin')
+        ->group(function () {
+            Route::get('/devices', [DeviceController::class, 'adminIndex'])->name('dashboard.admin.devices.index');
+        });
+
+
     // 🏨 HOTEL STAFF AREA
     Route::middleware(['auth', 'role:hotel_staff'])
         ->prefix('dashboard')
-        ->as('dashboard.') // <— ini yang penting! bukan name(), tapi as()
+        ->as('dashboard.')
         ->group(function () {
 
             // Hotel Info
@@ -66,7 +74,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('rooms/{id}/checkout', [RoomController::class, 'checkout'])->name('rooms.checkout');
 
             // 📺 Banners CRUD
-            // Route::resource('banners', BannerController::class)->except(['show'])->names('banners');
             Route::resource('banners', BannerController::class)->except(['show']);
 
             // 🧭 Shortcuts CRUD
@@ -74,5 +81,7 @@ Route::middleware(['auth'])->group(function () {
 
             // ℹ️ Contents CRUD
             Route::resource('contents', ContentController::class)->except(['show'])->names('contents');
+
+            Route::resource('devices', DeviceController::class)->except(['show'])->names('devices');
         });
 });

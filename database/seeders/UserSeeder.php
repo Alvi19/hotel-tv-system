@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
 
         // 2️⃣ Buat IT Admin (dari pihak kita)
         User::create([
-            'name' => 'it_admin',
+            'name' => 'it admin',
             'email' => 'it_admin@hotel.com',
             'password' => Hash::make('password123'),
             'role' => 'it_admin',
@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
 
         // 3️⃣ Buat Staff Hotel
         User::create([
-            'name' => 'hotel_staff',
+            'name' => 'hotel staff',
             'email' => 'hotel_staff@hotel.com',
             'password' => Hash::make('password123'),
             'role' => 'hotel_staff',
