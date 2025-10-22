@@ -20,7 +20,9 @@ class Hotel extends Model
         'email',
         'website',
         'logo_url',
-        'background_image_url'
+        'background_image_url',
+        'video_url',
+        'text_running'
     ];
 
     // Relasi

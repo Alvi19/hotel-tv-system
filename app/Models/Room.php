@@ -19,7 +19,8 @@ class Room extends Model
         'guest_name',
         'checkin',
         'checkout',
-        'status'
+        'status',
+        'category_id'
     ];
 
     protected $casts = [
@@ -35,5 +36,10 @@ class Room extends Model
     public function device(): HasOne
     {
         return $this->hasOne(Device::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(RoomCategory::class, 'category_id');
     }
 }

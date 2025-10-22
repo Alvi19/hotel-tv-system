@@ -1,5 +1,6 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,8 @@
             background: linear-gradient(145deg, #0f172a, #1e293b);
             color: #e2e8f0;
             overflow-x: hidden;
-            overflow-y: hidden; /* ✅ hilangkan scroll global */
+            overflow-y: hidden;
+            /* ✅ hilangkan scroll global */
         }
 
         /* ===== SIDEBAR ===== */
@@ -32,7 +34,7 @@
             flex-direction: column;
             justify-content: space-between;
             transition: all 0.3s ease;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
             z-index: 100;
         }
 
@@ -80,7 +82,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 30px;
-            position: fixed; /* ✅ fix di atas */
+            position: fixed;
+            /* ✅ fix di atas */
             top: 0;
             width: calc(100% - 260px);
             z-index: 99;
@@ -102,15 +105,17 @@
         .content {
             margin-left: 260px;
             padding: 30px;
-            padding-top: 100px; /* ✅ beri ruang navbar */
+            padding-top: 100px;
+            /* ✅ beri ruang navbar */
             height: calc(100vh - 70px);
-            overflow-y: auto; /* ✅ hanya scroll di dalam content */
+            overflow-y: auto;
+            /* ✅ hanya scroll di dalam content */
         }
 
         /* ===== CARD STYLE ===== */
         .card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-            border: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
             transition: all 0.3s ease;
@@ -185,6 +190,7 @@
 
     @stack('styles')
 </head>
+
 <body>
     <!-- ===== SIDEBAR ===== -->
     <div class="sidebar" id="sidebar">
@@ -197,7 +203,7 @@
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
 
-            @if(auth()->user()->isHotelStaff())
+            @if (auth()->user()->isHotelStaff())
                 <a href="/dashboard/hotel/edit" class="{{ request()->is('dashboard/hotel*') ? 'active' : '' }}">
                     <i class="bi bi-building"></i> Hotel Info
                 </a>
@@ -213,12 +219,13 @@
                 <a href="/dashboard/contents" class="{{ request()->is('dashboard/contents*') ? 'active' : '' }}">
                     <i class="bi bi-info-circle"></i> Contents
                 </a>
-                <a href="{{ route('dashboard.devices.index') }}" class="{{ request()->is('dashboard/devices*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.devices.index') }}"
+                    class="{{ request()->is('dashboard/devices*') ? 'active' : '' }}">
                     <i class="bi bi-tv"></i> Devices
                 </a>
             @endif
 
-            @if(auth()->check() && auth()->user()->isItAdmin())
+            @if (auth()->check() && auth()->user()->isItAdmin())
                 <hr class="border-secondary opacity-25">
                 <a href="/dashboard/users" class="{{ request()->is('dashboard/users*') ? 'active' : '' }}">
                     <i class="bi bi-people"></i> Manage Users
@@ -226,10 +233,19 @@
                 <a href="/dashboard/hotels" class="{{ request()->is('dashboard/hotels*') ? 'active' : '' }}">
                     <i class="bi bi-gear"></i> Manage Hotels
                 </a>
-                <a href="{{ route('dashboard.admin.devices.index') }}" class="{{ request()->is('dashboard/admin/devices*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.admin.devices.index') }}"
+                    class="{{ request()->is('dashboard/admin/devices*') ? 'active' : '' }}">
                     <i class="bi bi-hdd-network"></i> Manage Devices
                 </a>
             @endif
+
+            @if (auth()->user()->isSuperAdmin() || auth()->user()->isHotelAdmin())
+                <a href="{{ route('dashboard.roles.index') }}"
+                    class="{{ request()->is('dashboard/roles*') ? 'active' : '' }}">
+                    <i class="bi bi-person-gear"></i> Manage Roles
+                </a>
+            @endif
+
         </div>
 
         <form method="POST" action="{{ route('logout') }}" class="text-center mb-3">
@@ -249,7 +265,7 @@
 
     <!-- ===== CONTENT ===== -->
     <div class="content">
-        @if(session('success'))
+        @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
         @yield('content')
@@ -264,4 +280,178 @@
 
     @stack('scripts')
 </body>
+
+</html> --}}
+
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Hotel IPTV Dashboard')</title>
+
+    {{-- === TAILWIND + DAISYUI === --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- ICONS & FONTS --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+
+    @stack('styles')
+</head>
+
+<body class="bg-base-200 text-gray-200 flex min-h-screen overflow-hidden">
+
+    {{-- ===== SIDEBAR ===== --}}
+    <aside id="sidebar"
+        class="w-64 bg-base-300 border-r border-base-100 fixed h-screen flex flex-col justify-between z-50 transition-all duration-300 md:translate-x-0 -translate-x-full">
+        <div>
+            <div class="text-center py-6 text-lg font-semibold text-primary border-b border-base-100">
+                <i class="bi bi-shield-lock-fill me-2"></i> Super Admin
+            </div>
+
+            <nav class="mt-4 flex flex-col gap-1">
+                {{-- 🏠 Dashboard --}}
+                @canAccess('dashboard', 'view')
+                    <a href="{{ route('dashboard.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                @endcanAccess
+
+                <hr class="border-base-100 my-2">
+
+                {{-- 🧩 Roles --}}
+                @canAccess('roles', 'view')
+                    <a href="{{ route('dashboard.roles.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/roles*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-person-gear"></i> Manage Roles
+                    </a>
+                @endcanAccess
+
+                {{-- 👥 Users --}}
+                @canAccess('users', 'view')
+                    <a href="{{ route('dashboard.users.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/users*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-people"></i> Manage Users
+                    </a>
+                @endcanAccess
+
+                {{-- 🏨 Hotels --}}
+                @canAccess('hotels', 'view')
+                    <a href="{{ route('dashboard.hotels.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/hotels*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-building"></i> Manage Hotels
+                    </a>
+                @endcanAccess
+
+                {{-- 🚪 Rooms --}}
+                @canAccess('rooms', 'view')
+                <a href="{{ route('dashboard.rooms.index') }}"
+                    class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/rooms*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                    <i class="bi bi-door-open"></i> Manage Rooms
+                </a>
+                @endcanAccess
+
+                {{-- 🏷️ Room Categories --}}
+                @canAccess('categories', 'view')
+                    <a href="{{ route('dashboard.room-categories.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/room-categories*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-tags"></i> Room Categories
+                    </a>
+                @endcanAccess
+
+                {{-- 📺 Banners --}}
+                @canAccess('banners', 'view')
+                    <a href="{{ route('dashboard.banners.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/banners*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-image"></i> Manage Banners
+                    </a>
+                @endcanAccess
+
+                {{-- 💻 Devices --}}
+                @canAccess('devices', 'view')
+                    <a href="{{ route('dashboard.devices.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/devices*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-tv"></i> Manage Devices
+                    </a>
+                @endcanAccess
+
+                {{-- ℹ️ Contents --}}
+                @canAccess('contents', 'view')
+                    <a href="{{ route('dashboard.contents.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/contents*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-info-circle"></i> Manage Contents
+                    </a>
+                @endcanAccess
+
+                {{-- 🧭 Shortcuts --}}
+                @canAccess('shortcuts', 'view')
+                    <a href="{{ route('dashboard.shortcuts.index') }}"
+                        class="px-5 py-2 flex items-center gap-2 rounded-md transition
+                        {{ request()->is('dashboard/shortcuts*') ? 'bg-primary text-white' : 'hover:bg-base-100' }}">
+                        <i class="bi bi-grid"></i> Manage Shortcuts
+                    </a>
+                @endcanAccess
+            </nav>
+
+        </div>
+
+        <form method="POST" action="{{ route('logout') }}" class="p-5">
+            @csrf
+            <button type="submit" class="btn btn-error w-full">
+                <i class="bi bi-box-arrow-right me-1"></i> Logout
+            </button>
+        </form>
+    </aside>
+
+    {{-- ===== NAVBAR ===== --}}
+    <nav
+        class="fixed top-0 left-0 md:left-64 w-full md:w-[calc(100%-16rem)] bg-base-300 border-b border-base-100 z-40 flex items-center justify-between px-5 h-16 shadow-sm">
+        <button id="sidebarToggle" class="md:hidden text-xl text-gray-200 focus:outline-none">
+            <i class="bi bi-list"></i>
+        </button>
+        <span class="text-lg font-semibold text-white">Hotel IPTV Dashboard</span>
+        <span class="text-sm text-gray-400">{{ auth()->user()->name }}</span>
+    </nav>
+
+    {{-- ===== CONTENT ===== --}}
+    <main class="flex-1 md:ml-64 mt-16 p-6 overflow-y-auto">
+        @if (session('success'))
+            <div class="alert alert-success mb-4">
+                <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
+            </div>
+        @endif
+        @yield('content')
+
+    </main>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+    </script>
+
+    @stack('scripts')
+</body>
+
 </html>

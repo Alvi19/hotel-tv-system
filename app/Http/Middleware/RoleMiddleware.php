@@ -18,13 +18,20 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        $user = Auth::user();
-
-        // Jika user belum login atau role tidak sesuai
-        if (!$user || !in_array($user->role, $roles)) {
-            abort(403, 'Unauthorized access');
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        return $next($request);
+        $user = Auth::user();
+
+        if ($user->isSuperAdmin()) {
+            return $next($request);
+        }
+
+        if ($user->role && in_array($user->role->name, $roles)) {
+            return $next($request);
+        }
+
+        abort(403, 'Unauthorized: role restriction');
     }
 }

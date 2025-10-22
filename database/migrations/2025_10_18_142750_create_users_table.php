@@ -17,11 +17,25 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['it_admin', 'hotel_staff'])->default('hotel_staff');
-            $table->unsignedBigInteger('hotel_id')->nullable();
-            $table->foreign('hotel_id')->references('id')->on('hotels')->onDelete('cascade');
+            // $table->unsignedBigInteger('role_id')->nullable();
+            // $table->unsignedBigInteger('hotel_id')->nullable();
+            // ✅ Relasi ke tabel roles
+            $table->foreignId('role_id')
+                ->nullable()
+                ->constrained('roles')
+                ->onDelete('set null'); // kalau role dihapus, user tetap ada tapi role_id jadi null
+
+            // ✅ Relasi ke tabel hotels
+            $table->foreignId('hotel_id')
+                ->nullable()
+                ->constrained('hotels')
+                ->onDelete('cascade'); // kalau hotel dihapus, user ikut terhapus
             $table->rememberToken();
             $table->timestamps();
+
+            // foreign keys
+            // $table->foreign('role_id')->references('id')->on('roles')->nullOnDelete();
+            // $table->foreign('hotel_id')->references('id')->on('hotels')->onDelete('cascade');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

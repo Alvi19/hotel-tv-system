@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('website', 100)->nullable();
             $table->string('logo_url', 255)->nullable();
             $table->string('background_image_url', 255)->nullable();
+            $table->string('video_url', 255)->nullable();
+            $table->string('text_running', 255)->nullable();
             $table->timestamps();
         });
     }

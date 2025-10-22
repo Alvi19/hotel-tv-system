@@ -1,116 +1,137 @@
 @extends('layouts.app')
-@section('title', 'Add Room')
+
+@section('title', 'Add New Hotel')
 
 @section('content')
-<div class="container-fluid px-4">
-    <h3 class="mb-4 fw-semibold text-white">🚪 Add New Room</h3>
+<div class="p-6 h-[calc(100vh-100px)] overflow-y-auto">
 
-    <div class="card glass-card p-4">
-        <form action="{{ route('dashboard.rooms.store') }}" method="POST">
-            @csrf
+    {{-- Header --}}
+    <div class="flex items-center justify-between">
+        <h3 class="text-2xl font-semibold text-white flex items-center gap-2">
+            <i class="bi bi-building-add text-info"></i>
+            Add New Hotel
+        </h3>
+        <a href="{{ route('dashboard.hotels.index') }}" class="btn btn-outline btn-accent">
+            <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+    </div>
 
-            {{-- Room Number --}}
-            <div class="mb-3">
-                <label class="form-label fw-semibold text-light">Room Number</label>
-                <input type="text"
-                       name="room_number"
-                       class="form-control glass-input"
-                       placeholder="e.g. 101, 202B"
-                       required>
+    {{-- Error Message --}}
+    @if ($errors->any())
+        <div class="alert alert-error shadow-lg">
+            <div>
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>There were some issues:</span>
             </div>
+            <ul class="list-disc list-inside ml-4 mt-2 text-sm">
+                @foreach ($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-            {{-- Status --}}
-            <div class="mb-4">
-                <label class="form-label fw-semibold text-light">Status</label>
-                <select name="status" class="form-select glass-input text-white">
-                    <option value="available">Available</option>
-                    <option value="occupied">Occupied</option>
-                    <option value="maintenance">Maintenance</option>
-                </select>
-            </div>
+    {{-- Form Card --}}
+    <div class="card bg-base-300 border border-base-200 shadow-xl">
+        <div class="card-body">
+            <form method="POST" action="{{ route('dashboard.hotels.store') }}" enctype="multipart/form-data" class="space-y-6">
+                @csrf
 
-            {{-- Buttons --}}
-            <div class="d-flex justify-content-end gap-2">
-                <a href="{{ route('dashboard.rooms.index') }}" class="btn btn-outline-light px-4">
-                    <i class="bi bi-arrow-left"></i> Cancel
-                </a>
-                <button type="submit" class="btn btn-gradient px-4">
-                    <i class="bi bi-save me-1"></i> Save Room
-                </button>
-            </div>
-        </form>
+                {{-- Basic Info --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Hotel Name <span class="text-error">*</span></span>
+                        </label>
+                        <input type="text" name="name" placeholder="e.g. Grand Hotel" required class="input input-bordered w-full" />
+                    </div>
+
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Email</span>
+                        </label>
+                        <input type="email" name="email" placeholder="e.g. contact@hotel.com" class="input input-bordered w-full" />
+                    </div>
+                </div>
+
+                {{-- Description --}}
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-medium">Description</span>
+                    </label>
+                    <textarea name="description" rows="3" placeholder="Brief description about the hotel" class="textarea textarea-bordered w-full"></textarea>
+                </div>
+
+                {{-- 🏃 Running Text --}}
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-medium">Running Text</span>
+                    </label>
+                    <textarea name="text_running" rows="2" placeholder="e.g. Welcome to Grand Hotel! Enjoy your stay..." class="textarea textarea-bordered w-full"></textarea>
+                    <span class="text-sm text-gray-400 mt-1">*This text will be displayed as scrolling text on hotel screens or dashboard.</span>
+                </div>
+
+                {{-- Address & Contact --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Address</span>
+                        </label>
+                        <input type="text" name="address" placeholder="Hotel address" class="input input-bordered w-full" />
+                    </div>
+
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Phone</span>
+                        </label>
+                        <input type="text" name="phone" placeholder="e.g. +62 21 1234567" class="input input-bordered w-full" />
+                    </div>
+
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Website</span>
+                        </label>
+                        <input type="url" name="website" placeholder="https://hotel.com" class="input input-bordered w-full" />
+                    </div>
+                </div>
+
+                <hr class="border-base-200">
+
+                {{-- Uploads --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Upload Logo</span>
+                        </label>
+                        <input type="file" name="logo_url" accept="image/*" class="file-input file-input-bordered w-full" />
+                    </div>
+
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Background Image</span>
+                        </label>
+                        <input type="file" name="background_image_url" accept="image/*" class="file-input file-input-bordered w-full" />
+                    </div>
+
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Intro Video</span>
+                        </label>
+                        <input type="file" name="video_url" accept="video/*" class="file-input file-input-bordered w-full" />
+                    </div>
+                </div>
+
+                {{-- Buttons --}}
+                <div class="flex justify-end gap-3 pt-4">
+                    <a href="{{ route('dashboard.hotels.index') }}" class="btn btn-outline btn-accent">
+                        <i class="bi bi-x-circle me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary text-white">
+                        <i class="bi bi-check-circle me-1"></i> Save Hotel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
-@push('styles')
-<style>
-    /* ===== Card Style ===== */
-    .glass-card {
-        background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-        color: #e2e8f0;
-    }
-
-    /* ===== Input Style ===== */
-    .glass-input {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-        color: #f8fafc;
-        transition: 0.3s ease;
-    }
-
-    .glass-input:focus {
-        background: rgba(255, 255, 255, 0.15);
-        box-shadow: 0 0 0 2px rgba(99,102,241,0.4);
-        color: #fff;
-    }
-
-    .glass-input::placeholder {
-        color: rgba(255,255,255,0.6);
-    }
-
-    select.glass-input option {
-        background-color: #1e293b;
-        color: #e2e8f0;
-    }
-
-    /* ===== Buttons ===== */
-    .btn-gradient {
-        background: linear-gradient(90deg, #6366f1, #38bdf8);
-        color: #fff;
-        font-weight: 600;
-        border: none;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 12px rgba(99,102,241,0.4);
-    }
-
-    .btn-outline-light {
-        border-color: rgba(255,255,255,0.3);
-        color: #e2e8f0;
-        border-radius: 10px;
-        font-weight: 500;
-    }
-
-    .btn-outline-light:hover {
-        background: rgba(255,255,255,0.15);
-        color: #fff;
-    }
-
-    h3 {
-        color: #f8fafc;
-    }
-
-    label {
-        color: #cbd5e1;
-    }
-</style>
-@endpush
 @endsection
