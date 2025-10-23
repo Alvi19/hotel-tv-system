@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\LauncherController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\AdminHotelController;
 use App\Http\Controllers\Dashboard\BannerController;
@@ -20,6 +21,16 @@ Route::get('/', fn() => redirect()->route('login'));
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// 🚀 Launcher
+// Route::prefix('api')->group(function () {
+//     Route::get('/launcher/content', [LauncherController::class, 'getContent']);
+//     Route::get('/launcher/all', [LauncherController::class, 'getAllLauncherData']);
+// });
+Route::middleware('launcher.api')->prefix('api')->group(function () {
+    Route::get('/launcher/all', [LauncherController::class, 'getAllLauncherData']);
+    Route::get('/launcher/config', [LauncherController::class, 'getDeviceConfig']);
+});
 
 Route::middleware(['auth'])
     ->prefix('dashboard')

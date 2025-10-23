@@ -14,8 +14,17 @@ return new class extends Migration
         Schema::create('contents', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('hotel_id');
+            $table->unsignedBigInteger('room_type_id')->nullable();
             $table->string('title', 200);
-            $table->enum('type', ['about', 'facilities', 'services', 'contact'])->default('about');
+            $table->enum('type', [
+                'about',
+                'room_type',
+                'nearby_place',
+                'facility',
+                'event',
+                'promotion',
+                'policy'
+            ]);
             $table->string('image_url', 255)->nullable();
             $table->text('body')->nullable();
             $table->boolean('is_active')->default(true);

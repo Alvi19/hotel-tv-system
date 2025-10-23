@@ -4,15 +4,9 @@
 @section('content')
 <div class="container mt-3">
     <h3 class="text-light mb-3">Manage Room Categories</h3>
-
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
     <a href="{{ route('dashboard.room-categories.create') }}" class="btn btn-primary mb-3">
         <i class="bi bi-plus-circle"></i> Add Category
     </a>
-
     <table class="table table-bordered table-dark table-striped align-middle">
         <thead>
             <tr>

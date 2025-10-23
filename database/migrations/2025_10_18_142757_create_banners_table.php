@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('banners', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('hotel_id');
+
+            // Kolom hotel_id boleh null
+            $table->unsignedBigInteger('hotel_id')->nullable();
+
             $table->string('title', 200)->nullable();
             $table->text('description')->nullable();
             $table->string('image_url', 255)->nullable();
@@ -22,7 +25,11 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            $table->foreign('hotel_id')->references('id')->on('hotels')->onDelete('cascade');
+            // Foreign key tetap ada, tapi tidak wajib
+            $table->foreign('hotel_id')
+                ->references('id')
+                ->on('hotels')
+                ->onDelete('set null'); // kalau hotel dihapus, hotel_id jadi null
         });
     }
 

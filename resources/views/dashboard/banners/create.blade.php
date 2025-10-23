@@ -1,185 +1,158 @@
 @extends('layouts.app')
-@section('title', 'Add Banner')
+
+@section('title', 'Add New Banner')
+
 @section('content')
-<div class="container-fluid px-4">
-    <h3 class="mb-4 fw-semibold text-white">Add New Banner</h3>
-    <div class="card glass-card p-4">
-        <form action="{{ route('dashboard.banners.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="mb-3">
-                <label class="form-label fw-semibold text-light">Title</label>
-                <input type="text"
-                       name="title"
-                       class="form-control glass-input"
-                       placeholder="Enter banner title"
-                       required>
+    <div class="p-6 h-[calc(100vh-100px)] overflow-y-auto space-y-8">
+
+        {{-- HEADER --}}
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-gradient-to-r from-primary to-info rounded-xl">
+                    <i class="bi bi-megaphone text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-white">Add New Banner</h3>
             </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold text-light">Description</label>
-                <textarea name="description"
-                          class="form-control glass-input"
-                          rows="3"
-                          placeholder="Short description..."></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="form-label fw-semibold text-light">Banner Image</label>
-                <input type="file"
-                       name="image_url"
-                       class="form-control glass-input"
-                       accept="image/*"
-                       id="imageInput"
-                       required>
-                <div id="imagePreview" class="mt-3 d-none">
-                    <div class="preview-box">
-                        <img id="previewImage" class="img-preview" alt="Preview">
+            <a href="{{ route('dashboard.banners.index') }}" class="btn btn-outline btn-accent gap-2">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+
+        {{-- FORM CARD --}}
+        <div class="card bg-base-300 border border-base-200 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div class="card-body space-y-6">
+
+                <form action="{{ route('dashboard.banners.store') }}" method="POST" enctype="multipart/form-data"
+                    class="space-y-6">
+                    @csrf
+
+                    {{-- TITLE --}}
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text text-gray-300 font-medium">Title <span
+                                    class="text-error">*</span></span>
+                        </label>
+                        <input type="text" name="title" placeholder="Enter banner title"
+                            class="input input-bordered w-full bg-base-200 text-white placeholder-gray-400" required />
                     </div>
-                </div>
+
+                    {{-- DESCRIPTION --}}
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text text-gray-300 font-medium">Description</span>
+                        </label>
+                        <textarea name="description" rows="3" placeholder="Short description..."
+                            class="textarea textarea-bordered w-full bg-base-200 text-white placeholder-gray-400"></textarea>
+                    </div>
+
+                    {{-- IMAGE UPLOAD + PREVIEW --}}
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text text-gray-300 font-medium">Banner Image <span
+                                    class="text-error">*</span></span>
+                        </label>
+                        <input type="file" name="image_url" id="imageInput" accept="image/*"
+                            class="file-input file-input-bordered w-full bg-base-200 text-gray-300" required />
+
+                        {{-- PREVIEW --}}
+                        <div id="imagePreview" class="hidden mt-4">
+                            <div class="border border-base-200 rounded-xl p-2 bg-base-200/40 w-fit">
+                                <img id="previewImage"
+                                    class="w-56 h-36 object-cover rounded-lg shadow-md hover:scale-105 transition-transform duration-300"
+                                    alt="Preview">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 🔹 Assign to Hotel (for Super Admin only) --}}
+                    @if (Auth::user()->isSuperAdmin())
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text text-gray-300 font-medium">Assign to Hotel <span
+                                        class="text-error">*</span></span>
+                            </label>
+                            <select name="hotel_id" class="select select-bordered w-full bg-base-200 text-white" required>
+                                <option value="">-- Choose Hotel --</option>
+                                @foreach (\App\Models\Hotel::orderBy('name')->get() as $hotel)
+                                    <option value="{{ $hotel->id }}">{{ $hotel->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
+                    {{-- DATES --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text text-gray-300 font-medium">Active From</span>
+                            </label>
+                            <input type="date" name="active_from" id="active_from"
+                                class="input input-bordered bg-base-200 text-white" required />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text text-gray-300 font-medium">Active To</span>
+                            </label>
+                            <input type="date" name="active_to" id="active_to"
+                                class="input input-bordered bg-base-200 text-white" required />
+                        </div>
+                    </div>
+
+                    {{-- IS ACTIVE CHECKBOX --}}
+                    <div class="form-control">
+                        <label class="cursor-pointer flex items-center gap-3">
+                            <input type="checkbox" name="is_active" value="1" class="checkbox checkbox-info" checked />
+                            <span class="label-text text-gray-300 font-medium">Active</span>
+                        </label>
+                    </div>
+
+                    {{-- ACTION BUTTONS --}}
+                    <div class="flex justify-end gap-3 pt-4">
+                        <a href="{{ route('dashboard.banners.index') }}" class="btn btn-outline btn-accent gap-2">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary gap-2">
+                            <i class="bi bi-save"></i> Save Banner
+                        </button>
+                    </div>
+                </form>
+
             </div>
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold text-light">Active From</label>
-                    <input type="date"
-                           id="active_from"
-                           name="active_from"
-                           class="form-control glass-input"
-                           required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold text-light">Active To</label>
-                    <input type="date"
-                           id="active_to"
-                           name="active_to"
-                           class="form-control glass-input"
-                           required>
-                </div>
-            </div>
-            <div class="d-flex justify-content-end gap-2">
-                <a href="{{ route('dashboard.banners.index') }}" class="btn btn-outline-light px-4">
-                    <i class="bi bi-arrow-left"></i> Cancel
-                </a>
-                <button type="submit" class="btn btn-gradient px-4">
-                    <i class="bi bi-save me-1"></i> Save Banner
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-@push('styles')
-<style>
-    .glass-card {
-        background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-        color: #e2e8f0;
-    }
 
-    .glass-input {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-        color: #f8fafc;
-        transition: 0.3s ease;
-    }
+    {{-- IMAGE PREVIEW & DATE VALIDATION --}}
+    @push('scripts')
+        <script>
+            // Image preview
+            document.getElementById('imageInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                const previewContainer = document.getElementById('imagePreview');
+                const previewImage = document.getElementById('previewImage');
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        previewImage.src = evt.target.result;
+                        previewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContainer.classList.add('hidden');
+                }
+            });
 
-    .glass-input:focus {
-        background: rgba(255, 255, 255, 0.15);
-        box-shadow: 0 0 0 2px rgba(99,102,241,0.4);
-        color: #fff;
-    }
-
-    .glass-input::placeholder {
-        color: rgba(255,255,255,0.6);
-    }
-
-    .preview-box {
-        background: rgba(255,255,255,0.05);
-        border-radius: 12px;
-        padding: 6px;
-        display: inline-block;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .img-preview {
-        width: 220px;
-        border-radius: 10px;
-        object-fit: cover;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        transition: transform 0.3s ease;
-    }
-
-    .img-preview:hover {
-        transform: scale(1.03);
-    }
-
-    .btn-gradient {
-        background: linear-gradient(90deg, #6366f1, #38bdf8);
-        color: #fff;
-        font-weight: 600;
-        border: none;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 12px rgba(99,102,241,0.4);
-    }
-
-    .btn-outline-light {
-        border-color: rgba(255,255,255,0.3);
-        color: #e2e8f0;
-        border-radius: 10px;
-        font-weight: 500;
-    }
-
-    .btn-outline-light:hover {
-        background: rgba(255,255,255,0.15);
-        color: #fff;
-    }
-
-    h3 {
-        color: #f8fafc;
-    }
-
-    label {
-        color: #cbd5e1;
-    }
-</style>
-@endpush
-@push('scripts')
-<script>
-    document.getElementById('imageInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const previewContainer = document.getElementById('imagePreview');
-        const previewImage = document.getElementById('previewImage');
-
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                previewImage.src = evt.target.result;
-                previewContainer.classList.remove('d-none');
-            };
-            reader.readAsDataURL(file);
-        } else {
-            previewContainer.classList.add('d-none');
-        }
-    });
-
-    // === Prevent Past Dates ===
-    document.addEventListener('DOMContentLoaded', () => {
-        const today = new Date().toISOString().split('T')[0];
-        const fromInput = document.getElementById('active_from');
-        const toInput = document.getElementById('active_to');
-
-        fromInput.setAttribute('min', today);
-        toInput.setAttribute('min', today);
-
-        // Pastikan active_to tidak lebih awal dari active_from
-        fromInput.addEventListener('change', () => {
-            toInput.setAttribute('min', fromInput.value);
-        });
-    });
-</script>
-@endpush
+            // Date validation
+            document.addEventListener('DOMContentLoaded', () => {
+                const today = new Date().toISOString().split('T')[0];
+                const fromInput = document.getElementById('active_from');
+                const toInput = document.getElementById('active_to');
+                fromInput.setAttribute('min', today);
+                toInput.setAttribute('min', today);
+                fromInput.addEventListener('change', () => {
+                    toInput.setAttribute('min', fromInput.value);
+                });
+            });
+        </script>
+    @endpush
 @endsection

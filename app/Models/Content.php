@@ -15,7 +15,12 @@ class Content extends Model
         'type',
         'image_url',
         'body',
+        'room_type_id',
         'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function hotel()
@@ -23,8 +28,22 @@ class Content extends Model
         return $this->belongsTo(Hotel::class);
     }
 
+    public function roomType()
+    {
+        return $this->belongsTo(RoomCategory::class, 'room_type_id');
+    }
+
     public function getTypeLabelAttribute()
     {
-        return ucfirst($this->type);
+        return match ($this->type) {
+            'about' => 'About Hotel',
+            'room_type' => 'Room Type',
+            'nearby_place' => 'Nearby Place',
+            'facility' => 'Facility',
+            'event' => 'Event',
+            'promotion' => 'Promotion',
+            'policy' => 'Policy',
+            default => ucfirst($this->type),
+        };
     }
 }

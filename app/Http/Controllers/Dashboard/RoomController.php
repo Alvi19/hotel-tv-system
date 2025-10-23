@@ -13,17 +13,12 @@ use Illuminate\Support\Facades\Log;
 
 class RoomController extends Controller
 {
-    /**
-     * ✅ Tampilkan semua room (Super Admin melihat semua hotel, Staff hanya hotel sendiri)
-     */
     public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Ambil semua kategori untuk dropdown filter
-        $categories = \App\Models\RoomCategory::orderBy('name')->get();
+        $categories = RoomCategory::orderBy('name')->get();
 
-        // Ambil parameter filter (category_id)
         $categoryFilter = $request->input('category_id');
 
         // Query dasar
@@ -66,7 +61,6 @@ class RoomController extends Controller
             'category_id' => 'nullable|exists:room_categories,id',
         ];
 
-        // Super Admin wajib pilih hotel
         if ($user->isSuperAdmin()) {
             $rules['hotel_id'] = 'required|exists:hotels,id';
         }
@@ -165,14 +159,18 @@ class RoomController extends Controller
 
         try {
             $mqtt = new MqttService();
-            $mqtt->publish("hotel/{$room->hotel_id}/room/{$room->id}", [
+            $payload = [
                 'event' => 'checkin',
+                'hotel_id' => $room->hotel_id,
+                'room_id' => $room->id,
                 'room_number' => $room->room_number,
-                'category' => $room->category->name,
+                'room_type' => $room->category->name ?? null,
                 'guest_name' => $room->guest_name,
                 'status' => $room->status,
-                'timestamp' => now()->toDateTimeString(),
-            ]);
+                'timestamp' => now()->toIso8601String(),
+            ];
+            $topic = "hotel/{$room->hotel_id}/room/{$room->id}";
+            $mqtt->publish($topic, $payload);
         } catch (\Exception $e) {
             Log::error("❌ MQTT checkin failed: " . $e->getMessage());
         }
@@ -201,14 +199,18 @@ class RoomController extends Controller
 
         try {
             $mqtt = new MqttService();
-            $mqtt->publish("hotel/{$room->hotel_id}/room/{$room->id}", [
+            $payload = [
                 'event' => 'checkout',
+                'hotel_id' => $room->hotel_id,
+                'room_id' => $room->id,
                 'room_number' => $room->room_number,
-                'category' => $room->category->name,
+                'room_type' => $room->category->name ?? null,
                 'guest_name' => $prevGuest,
                 'status' => $room->status,
-                'timestamp' => now()->toDateTimeString(),
-            ]);
+                'timestamp' => now()->toIso8601String(),
+            ];
+            $topic = "hotel/{$room->hotel_id}/room/{$room->id}";
+            $mqtt->publish($topic, $payload);
         } catch (\Exception $e) {
             Log::error("❌ MQTT checkout failed: " . $e->getMessage());
         }

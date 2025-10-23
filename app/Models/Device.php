@@ -16,12 +16,14 @@ class Device extends Model
         'hotel_id',
         'room_id',
         'device_id',
+        'firmware_version',
         'status',
         'last_seen'
     ];
 
     protected $casts = [
-        'last_seen' => 'datetime'
+        'last_seen' => 'datetime',
+        'registered_at' => 'datetime',
     ];
 
     public function hotel(): BelongsTo
