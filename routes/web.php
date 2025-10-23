@@ -30,6 +30,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware('launcher.api')->prefix('api')->group(function () {
     Route::get('/launcher/all', [LauncherController::class, 'getAllLauncherData']);
     Route::get('/launcher/config', [LauncherController::class, 'getDeviceConfig']);
+    Route::get('/launcher/{stbId}', [LauncherController::class, 'getLauncherData']);
 });
 
 Route::middleware(['auth'])

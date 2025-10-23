@@ -93,7 +93,7 @@ class LauncherController extends Controller
             ->where('is_active', true)
             ->where(function ($q) use ($room) {
                 $q->whereNull('room_type_id')
-                ->orWhere('room_type_id', $room->category->id ?? null);
+                    ->orWhere('room_type_id', $room->category->id ?? null);
             })
             ->get()
             ->groupBy('type')
@@ -224,6 +224,29 @@ class LauncherController extends Controller
             'room_id' => $device->room->id,
             'room_number' => $device->room->room_number,
             'room_category' => $device->room->category->name ?? null,
+        ]);
+    }
+
+    public function getLauncherData($stbId)
+    {
+        // Contoh: ambil data STB dari database
+        $room = [
+            'guest_name' => 'John Doe',
+            'room_number' => '101',
+            'room_type' => 'Deluxe',
+        ];
+
+        $menus = [
+            ['name' => 'Restaurant'],
+            ['name' => 'Spa'],
+            ['name' => 'Wifi'],
+        ];
+
+        return response()->json([
+            'stb_id' => $stbId,
+            'room' => $room,
+            'menus' => $menus,
+            'hotel_description' => 'Welcome to our hotel! Enjoy your stay 😊',
         ]);
     }
 }
